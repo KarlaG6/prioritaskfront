@@ -7,12 +7,13 @@ import {
   deleteTaskService,
 } from "@/services/tasks.service";
 import { useAuth } from "./AuthContext";
+import { ITask } from "@/types/task";
 
 const TasksContext = createContext<any>(undefined);
 
 export function TasksProvider({ children }: { children: React.ReactNode }) {
   const { token } = useAuth();
-  const [tasks, setTasks] = useState<any[]>([]);
+  const [tasks, setTasks] = useState<ITask[]>([]);
   const [loading, setLoading] = useState(false);
 
   async function fetchTasks() {

@@ -7,6 +7,9 @@ import { CategoriesProvider } from "@/context/CategoriesContext";
 import { RemindersProvider } from "@/context/RemindersContext";
 import { NotificationsProvider } from "@/context/NotificationsContext";
 
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/app-sidebar";
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -36,7 +39,15 @@ export default function RootLayout({
           <TasksProvider>
             <CategoriesProvider>
               <RemindersProvider>
-                <NotificationsProvider>{children}</NotificationsProvider>
+                <NotificationsProvider>
+                  <SidebarProvider>
+                    <AppSidebar />
+                    <main>
+                      <SidebarTrigger />
+                      {children}
+                    </main>
+                  </SidebarProvider>
+                </NotificationsProvider>
               </RemindersProvider>
             </CategoriesProvider>
           </TasksProvider>
