@@ -1,63 +1,82 @@
 "use client";
 import React, { useState } from "react";
 import { useReminders } from "@/context/RemindersContext";
+import ReminderCard from "@/components/reminders/ReminderCard";
+import EditReminderModal from "@/components/reminders/EditReminderModal";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { motion } from "framer-motion";
 
 export default function RemindersPage() {
-  const { reminders, addReminder, removeReminder } = useReminders();
-  const [message, setMessage] = useState("");
-  const [date, setDate] = useState("");
-  const [type, setType] = useState("ONE_TIME");
+  const { reminders, addReminder, editReminder } = useReminders();
+  const [selected, setSelected] = useState(null);
+  const [modalOpen, setModalOpen] = useState(false);
 
-  async function onCreate(e: any) {
-    e.preventDefault();
-    await addReminder({ message, type, scheduleAt: date });
-    setMessage("");
-    setDate("");
+  function openModal(r: any) {
+    setSelected(r);
+    setModalOpen(true);
   }
 
+  const todayDate = new Date().toISOString().slice(0, 10);
+
+  const today = reminders.filter(
+    (r) => r.scheduleAt && r.scheduleAt.slice(0, 10) === todayDate
+  );
+
+  const scheduled = reminders.filter((r) => r.scheduleAt);
+
   return (
-    <div className="p-6 max-w-3xl mx-auto">
-      <h1 className="text-3xl mb-4">Recordatorios</h1>
-      <form onSubmit={onCreate} className="space-y-2 mb-6">
-        <input
-          className="input"
-          placeholder="Mensaje"
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-        />
-        <input
-          type="datetime-local"
-          className="input"
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
-        />
-        <select
-          className="input"
-          value={type}
-          onChange={(e) => setType(e.target.value)}
-        >
-          <option value="ONE_TIME">One time</option>
-          <option value="RECURRING">Recurring</option>
-        </select>
-        <button className="btn">Crear</button>
-      </form>
-      <div className="grid gap-3">
-        {reminders.map((r: any) => (
-          <div key={r.id} className="p-3 border rounded">
-            <div className="flex justify-between">
-              <div>
-                <strong>{r.message}</strong>
-                <div className="text-sm text-gray-600">
-                  {new Date(r.date).toLocaleString()}
-                </div>
-              </div>
-              <button className="btn" onClick={() => removeReminder(r.id)}>
-                Eliminar
-              </button>
-            </div>
-          </div>
-        ))}
-      </div>
+    <div className="p-6 max-w-4xl mx-auto">
+      <h1 className="text-3xl font-bold mb-6">Reminders</h1>
+
+      {/* Create Button */}
+      <Button
+        onClick={() => addReminder({ message: "New Reminder", type: "ONE_TIME" })}
+        className="mb-6"
+      >
+        + New Reminder
+      </Button>
+
+      {/* Tabs like Apple */}
+      <Tabs defaultValue="scheduled" className="space-y-6">
+        <TabsList className="grid grid-cols-3 w-full">
+          <TabsTrigger value="today">Today</TabsTrigger>
+          <TabsTrigger value="scheduled">Scheduled</TabsTrigger>
+          <TabsTrigger value="all">All</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="today">
+          <motion.div layout className="grid gap-4">
+            {today.map((rem) => (
+              <ReminderCard key={rem.id} reminder={rem} onEdit={openModal} />
+            ))}
+          </motion.div>
+        </TabsContent>
+
+        <TabsContent value="scheduled">
+          <motion.div layout className="grid gap-4">
+            {scheduled.map((rem) => (
+              <ReminderCard key={rem.id} reminder={rem} onEdit={openModal} />
+            ))}
+          </motion.div>
+        </TabsContent>
+
+        <TabsContent value="all">
+          <motion.div layout className="grid gap-4">
+            {reminders.map((rem) => (
+              <ReminderCard key={rem.id} reminder={rem} onEdit={openModal} />
+            ))}
+          </motion.div>
+        </TabsContent>
+      </Tabs>
+
+      {/* Modal */}
+      <EditReminderModal
+        reminder={selected}
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        onSave={editReminder}
+      />
     </div>
   );
 }

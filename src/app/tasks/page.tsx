@@ -73,7 +73,7 @@ export default function TasksPageClient() {
                     key={task.id}
                     className="rounded-2xl shadow-sm border hover:shadow-md transition"
                   >
-                    <CardContent className="p-4 space-y-2">
+                    <CardContent className="px-4 space-y-2">
                       <div className="flex justify-between items-start">
                         <h3 className="font-medium text-lg">{task.title}</h3>
 
