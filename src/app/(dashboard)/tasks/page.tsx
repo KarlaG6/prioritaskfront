@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { useTasks } from "@/context/TasksContext";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -13,6 +13,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import CreateTaskModal from "@/components/tasks/CreateTaskModal";
 
 // Títulos visibles
 const statusTitles: Record<TaskStatus, string> = {
@@ -22,7 +23,8 @@ const statusTitles: Record<TaskStatus, string> = {
 };
 
 export default function TasksPageClient() {
-  const { tasks, editTask } = useTasks();
+  const { tasks, editTask, removeTask } = useTasks();
+  const [isOpen, setIsOpen] = useState(false);
 
    const groups: Record<TaskStatus, ITask[]> = {
     pending: tasks.filter((t: ITask) => t.status === "pending"),
@@ -41,7 +43,7 @@ export default function TasksPageClient() {
       <div className="w-full flex justify-center mb-6">
         <Button
           className="px-6 py-2 rounded-xl shadow bg-indigo-600 hover:bg-indigo-700 text-white flex items-center gap-2"
-          onClick={() => alert("Abrir modal para crear tarea")}
+          onClick={() => setIsOpen(true)}
         >
           <Plus size={18} /> Add Task
         </Button>
@@ -127,6 +129,7 @@ export default function TasksPageClient() {
                           </span>
                         )}
                       </div>
+                      <Button onClick={() => removeTask(task.id)}>Delete</Button>
                     </CardContent>
                   </Card>
                 ))}
@@ -135,6 +138,7 @@ export default function TasksPageClient() {
           )
         )}
       </div>
+      <CreateTaskModal open={isOpen} onClose={() => setIsOpen(false)} />
     </div>
   );
 }
