@@ -14,6 +14,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import CreateTaskModal from "@/components/tasks/CreateTaskModal";
+import DeleteTaskModal from "@/components/tasks/DeleteTaskModal";
 
 // Títulos visibles
 const statusTitles: Record<TaskStatus, string> = {
@@ -25,10 +26,12 @@ const statusTitles: Record<TaskStatus, string> = {
 export default function TasksPageClient() {
   const { tasks, editTask, removeTask } = useTasks();
   const [isOpen, setIsOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false); // modal eliminar
+  const [taskToDelete, setTaskToDelete] = useState<string | null>(null);
 
-   const groups: Record<TaskStatus, ITask[]> = {
+  const groups: Record<TaskStatus, ITask[]> = {
     pending: tasks.filter((t: ITask) => t.status === "pending"),
-    "in_progress": tasks.filter((t: ITask) => t.status === "in_progress"),
+    in_progress: tasks.filter((t: ITask) => t.status === "in_progress"),
     done: tasks.filter((t: ITask) => t.status === "done"),
   };
 
@@ -38,7 +41,6 @@ export default function TasksPageClient() {
 
   return (
     <div className="p-6 flex flex-col items-center">
-
       {/* BOTÓN CREAR TAREA */}
       <div className="w-full flex justify-center mb-6">
         <Button
@@ -51,7 +53,6 @@ export default function TasksPageClient() {
 
       {/* COLUMNAS CENTRADAS */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-6xl">
-
         {(Object.entries(groups) as [TaskStatus, ITask[]][]).map(
           ([status, list]) => (
             <div
@@ -63,7 +64,6 @@ export default function TasksPageClient() {
               </h2>
 
               <div className="flex flex-col gap-4">
-
                 {list.length === 0 && (
                   <p className="text-sm text-gray-400 text-center">
                     No tasks here
@@ -99,7 +99,9 @@ export default function TasksPageClient() {
                             </DropdownMenuItem>
 
                             <DropdownMenuItem
-                              onClick={() => changeStatus(task.id, "in_progress")}
+                              onClick={() =>
+                                changeStatus(task.id, "in_progress")
+                              }
                             >
                               Move to In Progress
                             </DropdownMenuItem>
@@ -124,12 +126,20 @@ export default function TasksPageClient() {
 
                         {task.dueDate && (
                           <span className="text-xs text-gray-500">
-                            Due:{" "}
-                            {new Date(task.dueDate).toLocaleDateString()}
+                            Due: {new Date(task.dueDate).toLocaleDateString()}
                           </span>
                         )}
                       </div>
-                      <Button onClick={() => removeTask(task.id)}>Delete</Button>
+                      <Button
+                        variant="destructive"
+                        className="w-full mt-3"
+                        onClick={() => {
+                          setTaskToDelete(task.id);
+                          setDeleteOpen(true);
+                        }}
+                      >
+                        Delete
+                      </Button>
                     </CardContent>
                   </Card>
                 ))}
@@ -139,6 +149,16 @@ export default function TasksPageClient() {
         )}
       </div>
       <CreateTaskModal open={isOpen} onClose={() => setIsOpen(false)} />
+
+      <DeleteTaskModal
+        open={deleteOpen}
+        onClose={() => setDeleteOpen(false)}
+        onConfirm={() => {
+          if (taskToDelete) removeTask(taskToDelete);
+          setDeleteOpen(false)
+          setTaskToDelete(null);
+        }}
+      />
     </div>
   );
 }
