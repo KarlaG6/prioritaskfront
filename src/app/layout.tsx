@@ -1,41 +1,23 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono, Parisienne } from "next/font/google";
-import "./globals.css";
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
+"use client";
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import { AuthProvider } from "@/context/AuthContext";
+import { TasksProvider } from "@/context/TasksContext";
+import { CategoriesProvider } from "@/context/CategoriesContext";
+import { RemindersProvider } from "@/context/RemindersContext";
+import { NotificationsProvider } from "@/context/NotificationsContext";
 
-const parisienne = Parisienne({
-  subsets: ["latin"],
-  weight: "400",
-  variable: "--font-parisienne",
-});
-
-export const metadata: Metadata = {
-  title: "Prioritask",
-  description: "Task management app with prioritization and categories",
-};
-
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function HomeLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} ${parisienne.variable} antialiased`}
-      >
-        <main>
-          {children}
-        </main>
-      </body>
-    </html>
+    <AuthProvider>
+      <TasksProvider>
+        <CategoriesProvider>
+          <RemindersProvider>
+            <NotificationsProvider>
+              {children}
+            </NotificationsProvider>
+          </RemindersProvider>
+        </CategoriesProvider>
+      </TasksProvider>
+    </AuthProvider>
   );
 }
