@@ -2,11 +2,12 @@
 
 import React, { useState } from "react";
 import { useTasks } from "@/context/TasksContext";
+import { useCategories } from "@/context/CategoriesContext";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ITask, TaskStatus } from "@/types/task";
-import { Plus, ChevronDown } from "lucide-react";
+import { Plus, ChevronDown, Trash } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,6 +16,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import CreateTaskModal from "@/components/tasks/CreateTaskModal";
 import DeleteTaskModal from "@/components/tasks/DeleteTaskModal";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 // Títulos visibles
 const statusTitles: Record<TaskStatus, string> = {
@@ -25,9 +27,11 @@ const statusTitles: Record<TaskStatus, string> = {
 
 export default function TasksPageClient() {
   const { tasks, editTask, removeTask } = useTasks();
+  const { categories, setValue } = useCategories();
   const [isOpen, setIsOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false); // modal eliminar
   const [taskToDelete, setTaskToDelete] = useState<string | null>(null);
+  // const filtered = tasks.filter(task => task.categoryId === selectedCategoryId);
 
   const groups: Record<TaskStatus, ITask[]> = {
     pending: tasks.filter((t: ITask) => t.status === "pending"),
@@ -49,6 +53,25 @@ export default function TasksPageClient() {
         >
           <Plus size={18} /> Add Task
         </Button>
+        <Select onValueChange={(value) => setValue("categoryId", value)}>
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="Selecciona una categoría" />
+          </SelectTrigger>
+
+          <SelectContent>
+            {categories.map((cat: { id: string; name: string; color: string }) => (
+              <SelectItem key={cat.id} value={cat.id}>
+                <span className="flex items-center gap-2">
+                  <span
+                    className="w-3 h-3 rounded-full"
+                    style={{ backgroundColor: cat.color }}
+                  ></span>
+                  {cat.name}
+                </span>
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
       {/* COLUMNAS CENTRADAS */}
@@ -131,14 +154,13 @@ export default function TasksPageClient() {
                         )}
                       </div>
                       <Button
-                        variant="destructive"
-                        className="w-full mt-3"
+                        className="p-2 rounded-xl hover:bg-red-100 transition-colors"
                         onClick={() => {
                           setTaskToDelete(task.id);
                           setDeleteOpen(true);
                         }}
                       >
-                        Delete
+                        <Trash className="w-5 h-5 text-red-600" />
                       </Button>
                     </CardContent>
                   </Card>
@@ -155,7 +177,7 @@ export default function TasksPageClient() {
         onClose={() => setDeleteOpen(false)}
         onConfirm={() => {
           if (taskToDelete) removeTask(taskToDelete);
-          setDeleteOpen(false)
+          setDeleteOpen(false);
           setTaskToDelete(null);
         }}
       />
