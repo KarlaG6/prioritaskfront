@@ -31,13 +31,32 @@ export default function TasksPageClient() {
   const [isOpen, setIsOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false); // modal eliminar
   const [taskToDelete, setTaskToDelete] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+
   // const filtered = tasks.filter(task => task.categoryId === selectedCategoryId);
+  const filteredTasks = selectedCategory
+  ? tasks.filter(t => t.categoryId === selectedCategory)
+  : tasks;
+
 
   const groups: Record<TaskStatus, ITask[]> = {
     pending: tasks.filter((t: ITask) => t.status === "pending"),
     in_progress: tasks.filter((t: ITask) => t.status === "in_progress"),
     done: tasks.filter((t: ITask) => t.status === "done"),
   };
+
+//   // 1️⃣ Filtrar tareas según categoría seleccionada
+// const filteredTasks = selectedCategory && selectedCategory !== "all"
+//   ? tasksByCategories.filter((t) => t.categoryId === selectedCategory)
+//   : tasksByCategories;
+
+// // 2️⃣ Vuelves a agrupar pero con filteredTasks
+// const groups = {
+//   pending: filteredTasks.filter((t) => t.status === "pending"),
+//   in_progress: filteredTasks.filter((t) => t.status === "in_progress"),
+//   done: filteredTasks.filter((t) => t.status === "done"),
+// };
+
 
   async function changeStatus(id: string, newStatus: TaskStatus) {
     await editTask(id, { status: newStatus });
@@ -53,7 +72,7 @@ export default function TasksPageClient() {
         >
           <Plus size={18} /> Add Task
         </Button>
-        <Select onValueChange={(value) => setValue("categoryId", value)}>
+        <Select onValueChange={(value) => setSelectedCategory(value)}>
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Selecciona una categoría" />
           </SelectTrigger>

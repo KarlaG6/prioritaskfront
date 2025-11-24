@@ -5,7 +5,10 @@ export async function getCategoriesService(token: string) {
 const res = await fetch(`${API_URL}/categories`, { headers: { Authorization: `Bearer ${token}` } });
 return handleResp(res);
 }
-
+export async function getTasksByCategoriesService(token: string) {
+const res = await fetch(`${API_URL}/categories/tasks`, { headers: { Authorization: `Bearer ${token}` } });
+return handleResp(res);
+}
 
 export async function createCategoryService(token: string, body: any) {
 const res = await fetch(`${API_URL}/categories`, {
