@@ -31,13 +31,12 @@ export default function CreateTaskModal({
   const { addTask } = useTasks();
   const { categories } = useCategories();
 
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   const [form, setForm] = useState({
     title: "",
     description: "",
     priority: "medium",
-    categoryId: selectedCategory,
+    categoryId: null as string | null,
   });
 
   async function handleSubmit() {
@@ -52,6 +51,7 @@ export default function CreateTaskModal({
         description: form.description,
         priority: form.priority,
         status: "pending",
+        categoryId: form.categoryId,
       });
 
       // reset
@@ -59,7 +59,7 @@ export default function CreateTaskModal({
         title: "",
         description: "",
         priority: "medium",
-        categoryId: selectedCategory,
+        categoryId: null,
       });
 
       onClose();
@@ -117,6 +117,7 @@ export default function CreateTaskModal({
             onChange={(e) => setForm({ ...form, categoryId: e.target.value })}
             className="border rounded-md px-3 py-2 w-full"
           >
+            <option value={""}>None</option>
             {categories.map(
               (cat: { id: string; name: string; color: string }) => (
                 <option key={cat.id} value={cat.id}>
