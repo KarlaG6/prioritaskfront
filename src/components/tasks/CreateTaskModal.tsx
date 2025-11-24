@@ -1,12 +1,25 @@
 "use client";
 
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useTasks } from "@/context/TasksContext";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
+import { useCategories } from "@/context/CategoriesContext";
 
 export default function CreateTaskModal({
   open,
@@ -16,11 +29,15 @@ export default function CreateTaskModal({
   onClose: () => void;
 }) {
   const { addTask } = useTasks();
+  const { categories } = useCategories();
+
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   const [form, setForm] = useState({
     title: "",
     description: "",
     priority: "medium",
+    categoryId: selectedCategory,
   });
 
   async function handleSubmit() {
@@ -42,6 +59,7 @@ export default function CreateTaskModal({
         title: "",
         description: "",
         priority: "medium",
+        categoryId: selectedCategory,
       });
 
       onClose();
@@ -89,6 +107,23 @@ export default function CreateTaskModal({
             <option value="low">Low</option>
             <option value="medium">Medium</option>
             <option value="high">High</option>
+          </select>
+        </div>
+        {/* Category */}
+        <div className="space-y-1">
+          <Label>Category</Label>
+          <select
+            value={form.categoryId || ""}
+            onChange={(e) => setForm({ ...form, categoryId: e.target.value })}
+            className="border rounded-md px-3 py-2 w-full"
+          >
+            {categories.map(
+              (cat: { id: string; name: string; color: string }) => (
+                <option key={cat.id} value={cat.id}>
+                  {cat.name}
+                </option>
+              )
+            )}
           </select>
         </div>
 
