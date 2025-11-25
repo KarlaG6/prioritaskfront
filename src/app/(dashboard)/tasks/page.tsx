@@ -39,9 +39,12 @@ export default function TasksPageClient() {
   const [taskToDelete, setTaskToDelete] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
-  const filteredTasks = selectedCategory
-    ? tasks.filter((t) => t.categoryId === selectedCategory)
-    : tasks;
+const filteredTasks =
+  selectedCategory === null
+    ? tasks
+    : tasks.filter((t) => t.categoryId === selectedCategory);
+
+
 
   // Agrupar por status usando filteredTasks
   const groups: Record<TaskStatus, ITask[]> = {
@@ -53,7 +56,10 @@ export default function TasksPageClient() {
   async function changeStatus(id: string, newStatus: TaskStatus) {
     await editTask(id, { status: newStatus });
   }
-  function getCategoryInfo(categoryId: string | null | undefined, categories: any[]) {
+  function getCategoryInfo(
+    categoryId: string | null | undefined,
+    categories: any[]
+  ) {
     if (!categoryId) return null;
 
     const cat = categories.find((c) => c.id === categoryId);
@@ -68,19 +74,29 @@ export default function TasksPageClient() {
   return (
     <div className="p-6 flex flex-col items-center">
       {/* BOTÓN CREAR TAREA */}
-      <div className="w-full flex justify-center mb-6">
+      <div className="w-full flex justify-between mb-6 gap-x-2">
         <Button
           className="px-6 py-2 rounded-xl shadow bg-indigo-600 hover:bg-indigo-700 text-white flex items-center gap-2"
           onClick={() => setIsOpen(true)}
         >
           <Plus size={18} /> Add Task
         </Button>
-        <Select onValueChange={(value) => setSelectedCategory(value)}>
-          <SelectTrigger className="w-full">
+        <Select
+          onValueChange={(value) =>
+            setSelectedCategory(value === "all" ? null : value)
+          }
+        >
+          <SelectTrigger>
             <SelectValue placeholder="Selecciona una categoría" />
           </SelectTrigger>
 
           <SelectContent>
+            <SelectItem value="all">
+              <span className="flex items-center gap-2">
+                <span className="w-3 h-3 rounded-full bg-gray-300"></span>
+                Todas las categorías
+              </span>
+            </SelectItem>
             {categories.map(
               (cat: { id: string; name: string; color: string }) => (
                 <SelectItem key={cat.id} value={cat.id}>
@@ -170,8 +186,15 @@ export default function TasksPageClient() {
 
                       <div className="flex justify-between items-center pt-2">
                         <Badge>{task.priority}</Badge>
-                        { task.categoryId && (
-                          <Badge style={{ backgroundColor: getCategoryInfo(task.categoryId, categories)?.color }}>
+                        {task.categoryId && (
+                          <Badge
+                            style={{
+                              backgroundColor: getCategoryInfo(
+                                task.categoryId,
+                                categories
+                              )?.color,
+                            }}
+                          >
                             {getCategoryInfo(task.categoryId, categories)?.name}
                           </Badge>
                         )}
