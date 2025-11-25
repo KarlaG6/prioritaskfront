@@ -81,6 +81,16 @@ export default function LoginPage() {
             >
               {loading ? "Entrando..." : "Entrar"}
             </Button>
+
+            {/* Botón para ir a register */}
+            <Button
+              type="button"
+              variant="outline" // opcional, para diferenciarlo visualmente
+              className="w-full rounded-xl mt-2"
+              onClick={() => router.push("/register")}
+            >
+              Crear cuenta
+            </Button>
           </form>
         </CardContent>
       </Card>
