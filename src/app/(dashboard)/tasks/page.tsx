@@ -16,7 +16,13 @@ import {
 } from "@/components/ui/dropdown-menu";
 import CreateTaskModal from "@/components/tasks/CreateTaskModal";
 import DeleteTaskModal from "@/components/tasks/DeleteTaskModal";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 // Títulos visibles
 const statusTitles: Record<TaskStatus, string> = {
@@ -27,27 +33,36 @@ const statusTitles: Record<TaskStatus, string> = {
 
 export default function TasksPageClient() {
   const { tasks, editTask, removeTask } = useTasks();
-  const { categories, setValue } = useCategories();
+  const { categories } = useCategories();
   const [isOpen, setIsOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false); // modal eliminar
   const [taskToDelete, setTaskToDelete] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
-const filteredTasks = selectedCategory
-  ? tasks.filter((t) => t.categoryId === selectedCategory)
-  : tasks;
+  const filteredTasks = selectedCategory
+    ? tasks.filter((t) => t.categoryId === selectedCategory)
+    : tasks;
 
-// Agrupar por status usando filteredTasks
-const groups: Record<TaskStatus, ITask[]> = {
-  pending: filteredTasks.filter((t) => t.status === "pending"),
-  in_progress: filteredTasks.filter((t) => t.status === "in_progress"),
-  done: filteredTasks.filter((t) => t.status === "done"),
-};
-
-
+  // Agrupar por status usando filteredTasks
+  const groups: Record<TaskStatus, ITask[]> = {
+    pending: filteredTasks.filter((t) => t.status === "pending"),
+    in_progress: filteredTasks.filter((t) => t.status === "in_progress"),
+    done: filteredTasks.filter((t) => t.status === "done"),
+  };
 
   async function changeStatus(id: string, newStatus: TaskStatus) {
     await editTask(id, { status: newStatus });
+  }
+  function getCategoryInfo(categoryId: string | null | undefined, categories: any[]) {
+    if (!categoryId) return null;
+
+    const cat = categories.find((c) => c.id === categoryId);
+    if (!cat) return null;
+
+    return {
+      name: cat.name,
+      color: cat.color,
+    };
   }
 
   return (
@@ -66,17 +81,19 @@ const groups: Record<TaskStatus, ITask[]> = {
           </SelectTrigger>
 
           <SelectContent>
-            {categories.map((cat: { id: string; name: string; color: string }) => (
-              <SelectItem key={cat.id} value={cat.id}>
-                <span className="flex items-center gap-2">
-                  <span
-                    className="w-3 h-3 rounded-full"
-                    style={{ backgroundColor: cat.color }}
-                  ></span>
-                  {cat.name}
-                </span>
-              </SelectItem>
-            ))}
+            {categories.map(
+              (cat: { id: string; name: string; color: string }) => (
+                <SelectItem key={cat.id} value={cat.id}>
+                  <span className="flex items-center gap-2">
+                    <span
+                      className="w-3 h-3 rounded-full"
+                      style={{ backgroundColor: cat.color }}
+                    ></span>
+                    {cat.name}
+                  </span>
+                </SelectItem>
+              )
+            )}
           </SelectContent>
         </Select>
       </div>
@@ -153,6 +170,11 @@ const groups: Record<TaskStatus, ITask[]> = {
 
                       <div className="flex justify-between items-center pt-2">
                         <Badge>{task.priority}</Badge>
+                        { task.categoryId && (
+                          <Badge style={{ backgroundColor: getCategoryInfo(task.categoryId, categories)?.color }}>
+                            {getCategoryInfo(task.categoryId, categories)?.name}
+                          </Badge>
+                        )}
 
                         {task.dueDate && (
                           <span className="text-xs text-gray-500">
