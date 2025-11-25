@@ -3,13 +3,20 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { loginService, registerService } from "@/services/auth.service";
 
+type LoginResponse = {
+  user: {
+    id: string;
+    email: string;
+    onboarded: boolean;
+  };
+  token: string;
+};
 export interface AuthCtx {
   token: string | null;
   userId: string | null;
   loading: boolean;
 
-  login: (e: string, p: string) => Promise<void>;
-  loginUser: (email: string, password: string) => Promise<void>;
+  login: (e: string, p: string) => Promise<LoginResponse>;
   register: (n: string, e: string, p: string) => Promise<void>;
   registerUser: (n: string, e: string, p: string) => Promise<void>;
   logout: () => void;
@@ -29,7 +36,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (u) setUserId(u);
   }, []);
 
-  async function login(email: string, password: string) {
+  async function login(email: string, password: string): Promise<LoginResponse> {
     setLoading(true);
     try {
       const res = await loginService({ email, password });
@@ -39,6 +46,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUserId(res.user?.id || null);
       localStorage.setItem("token", res.token);
       if (res.user?.id) localStorage.setItem("userId", res.user.id);
+      return {
+        user: res.user,
+        token: res.token,
+      };
     } finally {
       setLoading(false);
     }
@@ -61,7 +72,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ token, userId, loading, login, loginUser: login, register, registerUser: register, logout }}>
+    <AuthContext.Provider
+      value={{
+        token,
+        userId,
+        loading,
+        login,
+        register,
+        registerUser: register,
+        logout,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

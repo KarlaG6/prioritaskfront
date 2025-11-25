@@ -4,18 +4,22 @@ import { TasksProvider } from "@/context/TasksContext";
 import { CategoriesProvider } from "@/context/CategoriesContext";
 import { RemindersProvider } from "@/context/RemindersContext";
 import { NotificationsProvider } from "@/context/NotificationsContext";
-
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/components/app-sidebar";
+import { Parisienne } from "next/font/google";
 import { OnboardingProvider } from "@/context/OnboardingContext";
 
-export default function DashboardLayout({
+const parisienne = Parisienne({
+  subsets: ["latin"],
+  weight: "400",
+  variable: "--font-parisienne",
+});
+
+export default function HomeLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className={parisienne.variable}>
       <body>
         <AuthProvider>
           <OnboardingProvider>
@@ -23,13 +27,7 @@ export default function DashboardLayout({
               <CategoriesProvider>
                 <RemindersProvider>
                   <NotificationsProvider>
-                    <SidebarProvider>
-                      <AppSidebar />
-                      <main>
-                        <SidebarTrigger />
-                        {children}
-                      </main>
-                    </SidebarProvider>
+                    <main>{children}</main>
                   </NotificationsProvider>
                 </RemindersProvider>
               </CategoriesProvider>

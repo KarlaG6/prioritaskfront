@@ -19,10 +19,11 @@ import { useCategories } from "@/context/CategoriesContext";
 import { useReminders } from "@/context/RemindersContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-
+import { useRouter } from "next/navigation";
 export default function HomeBento() {
   const { categories } = useCategories();
   const { reminders } = useReminders();
+  const router = useRouter();
   return (
     <div className="p-6 max-w-7xl mx-auto grid gap-6">
       {/* ---------- FILA 1 (2 boxes) ---------- */}
@@ -60,15 +61,7 @@ export default function HomeBento() {
                       asChild
                       className="rounded-3xl px-4 py-2 hover:bg-white transition text-sm font-medium"
                     >
-                      <Link href="/categories">Categorías</Link>
-                    </NavigationMenuLink>
-                  </NavigationMenuItem>
-                  <NavigationMenuItem>
-                    <NavigationMenuLink
-                      asChild
-                      className="rounded-3xl px-4 py-2 hover:bg-white transition text-sm font-medium"
-                    >
-                      <Link href="/reminders">Recordatorios</Link>
+                      <Link href="/logout">Cerrar sesión</Link>
                     </NavigationMenuLink>
                   </NavigationMenuItem>
                 </NavigationMenuList>
@@ -90,7 +83,7 @@ export default function HomeBento() {
         </div>
 
         {/* BOX 2 - Recordatorios */}
-        <Card className="rounded-3xl shadow p-6">
+        <Card className="rounded-3xl shadow p-6 hover:cursor-pointer" onClick={() => router.push("/reminders")}>
           <CardHeader className="p-0 mb-4">
             <CardTitle className="text-xl font-semibold">
               Recordatorios

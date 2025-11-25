@@ -1,4 +1,4 @@
-import { Calendar, Home, Bell, Search, ClipboardClock, Clipboard } from "lucide-react"
+import { Calendar, Home, Bell, Search, ClipboardClock, Clipboard, LogOut } from "lucide-react"
 
 import {
   Sidebar,
@@ -42,6 +42,11 @@ const items = [
     title: "Tasks",
     url: "/tasks",
     icon: Clipboard,
+  },
+    {
+    title: "Cerrar sesión",
+    url: "/logout",
+    icon: LogOut,
   },
 ]
 

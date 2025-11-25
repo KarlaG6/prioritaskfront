@@ -17,8 +17,20 @@ export default function LoginPage() {
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
+
     try {
-      await login(email, password);
+      const res = await login(email, password);
+
+      if (!res?.user) {
+        alert("Error: el backend no regresó un usuario");
+        return;
+      }
+
+      if (!res.user.onboarded) {
+        router.push("/welcome");
+        return;
+      }
+
       router.push("/home");
     } catch (err: any) {
       alert(err.message);
@@ -38,7 +50,6 @@ export default function LoginPage() {
 
         <CardContent>
           <form onSubmit={onSubmit} className="space-y-4">
-            {/* Email */}
             <div className="space-y-2">
               <Label htmlFor="email">Correo electrónico</Label>
               <Input
@@ -51,7 +62,6 @@ export default function LoginPage() {
               />
             </div>
 
-            {/* Password */}
             <div className="space-y-2">
               <Label htmlFor="password">Contraseña</Label>
               <Input
@@ -64,7 +74,6 @@ export default function LoginPage() {
               />
             </div>
 
-            {/* Button */}
             <Button
               type="submit"
               className="w-full rounded-xl"
